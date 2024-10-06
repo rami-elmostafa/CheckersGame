@@ -23,9 +23,9 @@ Implement a bitboard that represents the checkers board, using the utility class
  - Calculate and validate moves using binary arithmetic (e.g., shifting pieces using multiplication). 
  - Check for legal moves, captures, and conditions using bitwise operations. 
  - Display the checkers board state in binary and hexadecimal formats.
-####### Visual Representation
+###### Visual Representation
  - Implement a method to visually represent the Checker's board state on a console or graphical interface, showing binary and hexadecimal formats.
-######## Sprints
+###### Sprints
  1. Research and Setup: Research bitwise operations in various languages. Choose a language.
  2. Utility Class: Develop a utility class to manipulate individual bits and perform arithmetic.
  3. Bitboard Application: Create a bitboard for a checkers game using the utility class.
