@@ -91,16 +91,23 @@ int IsLegalMove(U64* board, int player, int start, int end) {
     int rowDiff = (end / 8) - (start / 8);
     int colDiff = (end % 8) - (start % 8);
 
-    if (abs(colDiff) == 1 && rowDiff == direction) {
-        return 1; // Valid regular move
+    // Regular move
+    if (direction == DOWN && rowDiff == 1 && (colDiff == -1 || colDiff == 1)) {
+        return 1; // Valid move down
+    } else if (direction == UP && rowDiff == -1 && (colDiff == -1 || colDiff == 1)) {
+        return 1; // Valid move up
     }
 
-    // Check for capture move (jump over opponent's piece)
-    if (abs(colDiff) == 2 && rowDiff == direction) {
-        int midIndex = (start + end) / 2; // Middle index to check for opponent's piece
-        if ((player == PLAYER1 && (board[PLAYER2] & (1ULL << midIndex))) ||
-            (player == PLAYER2 && (board[PLAYER1] & (1ULL << midIndex)))) {
-            return 1; // Valid capture move
+    // Capture move
+    if (direction == DOWN && rowDiff == 2 && (colDiff == -2 || colDiff == 2)) {
+        int middle = start + (rowDiff / 2) * 8 + (colDiff / 2);
+        if ((board[PLAYER1] & (1ULL << middle)) || (board[PLAYER2] & (1ULL << middle))) {
+            return 1; // Valid capturing move
+        }
+    } else if (direction == UP && rowDiff == -2 && (colDiff == -2 || colDiff == 2)) {
+        int middle = start + (rowDiff / 2) * 8 + (colDiff / 2);
+        if ((board[PLAYER1] & (1ULL << middle)) || (board[PLAYER2] & (1ULL << middle))) {
+            return 1; // Valid capturing move
         }
     }
 
@@ -127,9 +134,10 @@ void UpdateGameState(U64* board, int* currentPlayer) {
 }
 
 // Removes a piece from the opponent's bitboard when captured
-void CapturePiece(U64* board, int player, int position) {
-    int opponent = (player == PLAYER1) ? PLAYER2 : PLAYER1;
-    board[opponent] = ClearBit(board[opponent], position);
+void CapturePiece(U64* board, int position) {
+    // Logic to capture a piece
+    board[PLAYER1] = ClearBit(board[PLAYER1], position);
+    board[PLAYER2] = ClearBit(board[PLAYER2], position);
 }
 
 // Moves a piece from one position to another
@@ -143,6 +151,13 @@ int MovePiece(U64* board, int player, const char* from, const char* to) {
     }
 
     if (IsLegalMove(board, player, fromIndex, toIndex)) {
+        // If capturing, remove the opponent's piece
+        int middle = (fromIndex + toIndex) / 2; // Calculate the position of the captured piece
+        if ((player == PLAYER1 && (board[PLAYER2] & (1ULL << middle))) ||
+            (player == PLAYER2 && (board[PLAYER1] & (1ULL << middle)))) {
+            CapturePiece(board, middle); // Capture the piece
+            }
+
         board[player] = ClearBit(board[player], fromIndex);
         board[player] = SetBit(board[player], toIndex);
         return 1; // Indicate success

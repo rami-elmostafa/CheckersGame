@@ -6,16 +6,20 @@ int main() {
     InitializeBoard(board);
     PrintBoard(board);
 
-    int currentPlayer = PLAYER1; // Start with Player 1
-    char from[3], to[3]; // For storing user input
+    int currentPlayer = PLAYER1;
+    char input[10];
 
     while (1) {
-        printf("\nPlayer %d's turn. Enter move (e.g., 'B2 B3'): ", currentPlayer + 1);
-        scanf("%2s %2s", from, to); // Read two inputs for from and to positions
+        printf("Player %d's turn. Enter move (e.g., 'B2 D4'): ", currentPlayer + 1);
+        fgets(input, sizeof(input), stdin);
+
+        // Split the input into from and to
+        char from[3], to[3];
+        sscanf(input, "%2s %2s", from, to);
 
         if (MovePiece(board, currentPlayer, from, to)) {
-            PrintBoard(board); // Print the board after the move
-            UpdateGameState(board, &currentPlayer); // Update game state and switch players
+            PrintBoard(board);
+            UpdateGameState(board, &currentPlayer); // Use & to pass the address
         } else {
             printf("Invalid move. Try again.\n");
         }
