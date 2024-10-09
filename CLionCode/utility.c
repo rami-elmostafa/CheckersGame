@@ -1,7 +1,10 @@
 #include "utility.h"
+
+#include <stdlib.h> // For exit
 #include <stdio.h>
 #include <string.h>
 
+#define ABS(x) ((x) < 0 ? -(x) : (x)) // Macro for absolute value
 #define PLAYER1 0
 #define PLAYER2 1
 
@@ -88,48 +91,63 @@ int IsLegalMove(U64* board, int player, int start, int end) {
     int rowDiff = (end / 8) - (start / 8);
     int colDiff = (end % 8) - (start % 8);
 
-    if (direction == DOWN) {
-        if (rowDiff == 1 && (colDiff == -1 || colDiff == 1)) {
-            return 1; // Valid move
-        }
-    } else { // direction == UP
-        if (rowDiff == -1 && (colDiff == -1 || colDiff == 1)) {
-            return 1; // Valid move
+    if (abs(colDiff) == 1 && rowDiff == direction) {
+        return 1; // Valid regular move
+    }
+
+    // Check for capture move (jump over opponent's piece)
+    if (abs(colDiff) == 2 && rowDiff == direction) {
+        int midIndex = (start + end) / 2; // Middle index to check for opponent's piece
+        if ((player == PLAYER1 && (board[PLAYER2] & (1ULL << midIndex))) ||
+            (player == PLAYER2 && (board[PLAYER1] & (1ULL << midIndex)))) {
+            return 1; // Valid capture move
         }
     }
 
     return 0; // Invalid move
 }
 
-// Implement logic to update the game state after each move // Switch turns, check for game-ending conditions, etc.
-void UpdateGameState(U64* board, int currentPlayer) {
+// Logic to update the game state after each move
+void UpdateGameState(U64* board, int* currentPlayer) {
+    // Check for win conditions
+    int player1Pieces = __builtin_popcountll(board[PLAYER1]); // Count pieces for Player 1
+    int player2Pieces = __builtin_popcountll(board[PLAYER2]); // Count pieces for Player 2
 
+    if (player1Pieces == 0) {
+        printf("Player 2 wins!\n");
+        exit(0); // Exit the game
+    }
+    if (player2Pieces == 0) {
+        printf("Player 1 wins!\n");
+        exit(0); // Exit the game
+    }
+
+    // Switch turns
+    *currentPlayer = (*currentPlayer == PLAYER1) ? PLAYER2 : PLAYER1;
 }
 
-//Removes a piece from the opponent's bitboard when captured. This method updates the opponent's bitboard to reflect the capture.
-void CapturePiece(U64* board, int position) {
-    board[position] = 0;
+// Removes a piece from the opponent's bitboard when captured
+void CapturePiece(U64* board, int player, int position) {
+    int opponent = (player == PLAYER1) ? PLAYER2 : PLAYER1;
+    board[opponent] = ClearBit(board[opponent], position);
 }
-
-
-
-
-
 
 // Moves a piece from one position to another
-void MovePiece(U64* board, int player, const char* from, const char* to) {
+int MovePiece(U64* board, int player, const char* from, const char* to) {
     int fromIndex = ConvertInputToIndex(from);
     int toIndex = ConvertInputToIndex(to);
 
     if (fromIndex == -1 || toIndex == -1) {
         printf("Invalid input\n");
-        return;
+        return 0; // Indicate failure
     }
 
     if (IsLegalMove(board, player, fromIndex, toIndex)) {
         board[player] = ClearBit(board[player], fromIndex);
         board[player] = SetBit(board[player], toIndex);
+        return 1; // Indicate success
     } else {
         printf("Illegal move\n");
+        return 0; // Indicate failure
     }
 }
