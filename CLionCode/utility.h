@@ -12,7 +12,7 @@ U64 ClearBit(U64 value, int position);
 void InitializeBoard(U64* board, U64* kings);
 void PrintBoard(U64* board, U64* kings);
 int MovePiece(U64* board, U64* kings,int player, const char* from, const char* to);
-int IsLegalMove(U64* board,int player, int start, int end);
+int IsLegalMove(U64* board,U64* kings,int player, int start, int end);
 void UpdateGameState(U64* board, int* currentPlayer);
 void CapturePiece(U64* board,int player, int position);
 

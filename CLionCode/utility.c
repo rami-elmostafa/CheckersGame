@@ -89,16 +89,15 @@ void PrintBoard(U64* board, U64* kings) {
 
 
 // Checks if the move is diagonal and valid
-int IsLegalMove(U64* board, int player, int start, int end) {
-    Direction direction = (player == PLAYER1) ? DOWN : UP; // Player 1 moves down, Player 2 moves up
-
+// Checks if the move is diagonal and valid
+int IsLegalMove(U64* board, U64* kings, int player, int start, int end) {
     // Basic move validation
     if (end < 0 || end >= 64 || start < 0 || start >= 64) {
         return 0; // Out of bounds
     }
 
-    // Check if the starting position has a piece
-    if (!(board[player] & (1ULL << start))) {
+    // Check if the starting position has a piece (regular or king)
+    if (!(board[player] & (1ULL << start)) && !(kings[player] & (1ULL << start))) {
         return 0; // No piece at the start
     }
 
@@ -107,27 +106,35 @@ int IsLegalMove(U64* board, int player, int start, int end) {
         return 0; // End position is not empty
     }
 
-    // Check if moving diagonally (valid diagonal moves for checkers)
+    // Calculate row and column differences
     int rowDiff = (end / 8) - (start / 8);
     int colDiff = (end % 8) - (start % 8);
 
-    // Regular move
-    if (direction == DOWN && rowDiff == 1 && (colDiff == -1 || colDiff == 1)) {
-        return 1; // Valid move down
-    } else if (direction == UP && rowDiff == -1 && (colDiff == -1 || colDiff == 1)) {
-        return 1; // Valid move up
+    // Regular move for regular pieces
+    if ((player == PLAYER1 && rowDiff == 1 && (colDiff == -1 || colDiff == 1)) || // Down moves
+        (player == PLAYER2 && rowDiff == -1 && (colDiff == -1 || colDiff == 1))) { // Up moves
+        return 1; // Valid move for regular pieces
+        }
+
+    // Moves for kings (both directions)
+    if (abs(rowDiff) == 1 && (colDiff == -1 || colDiff == 1)) {
+        return 1; // Valid diagonal move for kings
     }
 
-    // Capture move
-    if (direction == DOWN && rowDiff == 2 && (colDiff == -2 || colDiff == 2)) {
+    // Capture move for regular pieces
+    if ((player == PLAYER1 && rowDiff == 2 && (colDiff == -2 || colDiff == 2)) ||
+        (player == PLAYER2 && rowDiff == -2 && (colDiff == -2 || colDiff == 2))) {
         int middle = start + (rowDiff / 2) * 8 + (colDiff / 2);
         if ((board[PLAYER1] & (1ULL << middle)) || (board[PLAYER2] & (1ULL << middle))) {
             return 1; // Valid capturing move
         }
-    } else if (direction == UP && rowDiff == -2 && (colDiff == -2 || colDiff == 2)) {
+        }
+
+    // Capture move for kings
+    if (abs(rowDiff) == 2 && (colDiff == -2 || colDiff == 2)) {
         int middle = start + (rowDiff / 2) * 8 + (colDiff / 2);
         if ((board[PLAYER1] & (1ULL << middle)) || (board[PLAYER2] & (1ULL << middle))) {
-            return 1; // Valid capturing move
+            return 1; // Valid capturing move for kings
         }
     }
 
@@ -172,7 +179,7 @@ int MovePiece(U64* board, U64* kings, int player, const char* from, const char* 
     }
 
     // Check if the move is legal
-    if (!IsLegalMove(board, player, fromIndex, toIndex)) {
+    if (!IsLegalMove(board, kings, player, fromIndex, toIndex)) {
         printf("Illegal move\n");
         return 0; // Indicate failure
     }
