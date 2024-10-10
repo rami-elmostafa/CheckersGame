@@ -3,8 +3,9 @@
 
 int main() {
     U64 board[2];
-    InitializeBoard(board);
-    PrintBoard(board);
+    U64 kings[2];
+    InitializeBoard(board, kings);
+    PrintBoard(board, kings);
 
     int currentPlayer = PLAYER1;
     char input[10];
@@ -17,8 +18,8 @@ int main() {
         char from[3], to[3];
         sscanf(input, "%2s %2s", from, to);
 
-        if (MovePiece(board, currentPlayer, from, to)) {
-            PrintBoard(board);
+        if (MovePiece(board, kings, currentPlayer, from, to)) { // Pass kings array
+            PrintBoard(board, kings);
             UpdateGameState(board, &currentPlayer); // Use & to pass the address
         } else {
             printf("Invalid move. Try again.\n");

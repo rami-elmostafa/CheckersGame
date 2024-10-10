@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 
+U64 board[2];     // Standard pieces
+U64 kings[2];     // King pieces
+
 #define ABS(x) ((x) < 0 ? -(x) : (x)) // Macro for absolute value
 #define PLAYER1 0
 #define PLAYER2 1
@@ -19,9 +22,13 @@ U64 ClearBit(U64 value, int position) {
 }
 
 // Initializes the board with pieces
-void InitializeBoard(U64* board) {
+void InitializeBoard(U64* board, U64* kings) {
+    // Initialize the regular pieces
     board[PLAYER1] = 0ULL; // Player 1
     board[PLAYER2] = 0ULL; // Player 2
+    // Initialize the king pieces
+    kings[PLAYER1] = 0ULL;
+    kings[PLAYER2] = 0ULL;
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 8; j++) {
             if ((i + j) % 2 != 0) {
@@ -51,14 +58,26 @@ int ConvertInputToIndex(const char* input) {
 }
 
 // Prints the current state of the board
-void PrintBoard(U64* board) {
+// Prints the current state of the board
+void PrintBoard(U64* board, U64* kings) {
     for (int i = 0; i < 8; i++) {
         printf("%d ", i); // Row headers
         for (int j = 0; j < 8; j++) {
-            if (board[PLAYER1] & (1ULL << (i * 8 + j))) {
-                printf("R ");  // Print Red for player 1
-            } else if (board[PLAYER2] & (1ULL << (i * 8 + j))) {
-                printf("B ");  // Print Black for player 2
+            int index = i * 8 + j;
+            if (board[PLAYER1] & (1ULL << index)) {
+                // If it's a king piece
+                if (kings[PLAYER1] & (1ULL << index)) {
+                    printf("R^ ");  // King piece for player 1
+                } else {
+                    printf("R ");   // Regular piece for player 1
+                }
+            } else if (board[PLAYER2] & (1ULL << index)) {
+                // If it's a king piece
+                if (kings[PLAYER2] & (1ULL << index)) {
+                    printf("B^ ");  // King piece for player 2
+                } else {
+                    printf("B ");   // Regular piece for player 2
+                }
             } else {
                 printf(". ");  // Print '.' for empty spaces
             }
@@ -67,6 +86,7 @@ void PrintBoard(U64* board) {
     }
     printf("  A B C D E F G H\n"); // Column headers
 }
+
 
 // Checks if the move is diagonal and valid
 int IsLegalMove(U64* board, int player, int start, int end) {
@@ -134,35 +154,57 @@ void UpdateGameState(U64* board, int* currentPlayer) {
 }
 
 // Removes a piece from the opponent's bitboard when captured
-void CapturePiece(U64* board, int position) {
+void CapturePiece(U64* board,int player, int position) {
     // Logic to capture a piece
     board[PLAYER1] = ClearBit(board[PLAYER1], position);
     board[PLAYER2] = ClearBit(board[PLAYER2], position);
 }
 
 // Moves a piece from one position to another
-int MovePiece(U64* board, int player, const char* from, const char* to) {
+int MovePiece(U64* board, U64* kings, int player, const char* from, const char* to) {
     int fromIndex = ConvertInputToIndex(from);
     int toIndex = ConvertInputToIndex(to);
 
+    // Check for invalid input
     if (fromIndex == -1 || toIndex == -1) {
         printf("Invalid input\n");
         return 0; // Indicate failure
     }
 
-    if (IsLegalMove(board, player, fromIndex, toIndex)) {
-        // If capturing, remove the opponent's piece
-        int middle = (fromIndex + toIndex) / 2; // Calculate the position of the captured piece
-        if ((player == PLAYER1 && (board[PLAYER2] & (1ULL << middle))) ||
-            (player == PLAYER2 && (board[PLAYER1] & (1ULL << middle)))) {
-            CapturePiece(board, middle); // Capture the piece
-            }
-
-        board[player] = ClearBit(board[player], fromIndex);
-        board[player] = SetBit(board[player], toIndex);
-        return 1; // Indicate success
-    } else {
+    // Check if the move is legal
+    if (!IsLegalMove(board, player, fromIndex, toIndex)) {
         printf("Illegal move\n");
         return 0; // Indicate failure
     }
+
+    // Move the piece
+    board[player] = ClearBit(board[player], fromIndex);
+    board[player] = SetBit(board[player], toIndex);
+
+    // Check for capturing
+    int middle = (fromIndex + toIndex) / 2;
+    if (player == PLAYER1 && (middle >= 8 && (board[PLAYER2] & (1ULL << middle)))) {
+        CapturePiece(board, PLAYER2, middle);
+    } else if (player == PLAYER2 && (middle < 56 && (board[PLAYER1] & (1ULL << middle)))) {
+        CapturePiece(board, PLAYER1, middle);
+    }
+
+    // Check for king promotion
+    if ((player == PLAYER1 && toIndex >= 56) || (player == PLAYER2 && toIndex < 8)) {
+        PromoteToKing(board, kings, player, toIndex);
+    }
+
+    printf("Moved from %s to %s. Board for Player 1: %llu, Kings: %llu\n", from, to, board[PLAYER1], kings[PLAYER1]);
+
+    return 1; // Indicate success
+}
+void PromoteToKing(U64* board, U64* kings, int player, int position) {
+    if (player == PLAYER1 && position >= 56) { // Rows 0-7 for Player 1
+        kings[PLAYER1] = SetBit(kings[PLAYER1], position);
+        // No need to clear the regular piece from the board
+    } else if (player == PLAYER2 && position < 8) { // Rows 56-63 for Player 2
+        kings[PLAYER2] = SetBit(kings[PLAYER2], position);
+        // No need to clear the regular piece from the board
+    }
+    printf("Promoting piece at position %d for Player %d\n", position, player + 1);
 }
