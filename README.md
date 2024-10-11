@@ -24,14 +24,6 @@ Implement a bitboard that represents the checkers board, using the utility class
  - Check for legal moves, captures, and conditions using bitwise operations. 
  - Display the checkers board state in binary and hexadecimal formats.
 
-###### Visual Representation
- - Implement a method to visually represent the Checker's board state on a console or graphical interface, showing binary and hexadecimal formats.
-###### Sprints
- 1. Research and Setup: Research bitwise operations in various languages. Choose a language.
- 2. Utility Class: Develop a utility class to manipulate individual bits and perform arithmetic.
- 3. Bitboard Application: Create a bitboard for a checkers game using the utility class.
- 4. Documentation & Presentation: Write a report, document the application, and prepare a video demo.
- 5. Final Submission: Submit code, report, and video.
 ```mermaid
 classDiagram
     class BitManipulation {
@@ -60,3 +52,14 @@ classDiagram
     }
 
     BitManipulation -- BitboardChecker : uses
+
+###### Visual Representation
+ - Implement a method to visually represent the Checker's board state on a console or graphical interface, showing binary and hexadecimal formats.
+###### Sprints
+ 1. Research and Setup: Research bitwise operations in various languages. Choose a language.
+ 2. Utility Class: Develop a utility class to manipulate individual bits and perform arithmetic.
+ 3. Bitboard Application: Create a bitboard for a checkers game using the utility class.
+ 4. Documentation & Presentation: Write a report, document the application, and prepare a video demo.
+ 5. Final Submission: Submit code, report, and video.
+######Download the Final Report (.pdf) 
+file:///C:/Users/ramie/Downloads/CS%203503_Report_CheckersGame_RamiElmostafa.pdf 
