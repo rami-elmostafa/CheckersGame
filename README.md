@@ -51,7 +51,7 @@ classDiagram
         +displayBoardHex()
     }
 
-    BitManipulation -- BitboardChecker : uses
+    BitManipulation -- BitboardChecker : uses```
 
 ###### Visual Representation
  - Implement a method to visually represent the Checker's board state on a console or graphical interface, showing binary and hexadecimal formats.
@@ -61,5 +61,5 @@ classDiagram
  3. Bitboard Application: Create a bitboard for a checkers game using the utility class.
  4. Documentation & Presentation: Write a report, document the application, and prepare a video demo.
  5. Final Submission: Submit code, report, and video.
-######Download the Final Report (.pdf) 
-file:///C:/Users/ramie/Downloads/CS%203503_Report_CheckersGame_RamiElmostafa.pdf 
+######View the Final Report (.doc) 
+<iframe src="https://docs.google.com/document/d/e/2PACX-1vR6HW-xK8MFDgO1YQlAov65aIoRwXgeg9iXwQLQgjAgNMe3yXNbk2dweM-Powg5fLZEr7LYKi4XcbMg/pub?embedded=true"></iframe> 
