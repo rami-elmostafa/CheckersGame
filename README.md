@@ -24,7 +24,6 @@ Implement a bitboard that represents the checkers board, using the utility class
  - Check for legal moves, captures, and conditions using bitwise operations. 
  - Display the checkers board state in binary and hexadecimal formats.
 
-```mermaid
 classDiagram
     class BitManipulation {
         +setBit(value, bit) 
@@ -51,7 +50,7 @@ classDiagram
         +displayBoardHex()
     }
 
-    BitManipulation -- BitboardChecker : uses```
+    BitManipulation -- BitboardChecker : uses
 
 ###### Visual Representation
  - Implement a method to visually represent the Checker's board state on a console or graphical interface, showing binary and hexadecimal formats.
@@ -62,4 +61,4 @@ classDiagram
  4. Documentation & Presentation: Write a report, document the application, and prepare a video demo.
  5. Final Submission: Submit code, report, and video.
 ######View the Final Report (.doc) 
-<iframe src="https://docs.google.com/document/d/e/2PACX-1vR6HW-xK8MFDgO1YQlAov65aIoRwXgeg9iXwQLQgjAgNMe3yXNbk2dweM-Powg5fLZEr7LYKi4XcbMg/pub?embedded=true"></iframe> 
+[Final Report][https://docs.google.com/document/d/10eXduLySlO4PDwgzRB1ZDp6Pn4deG9OxJQQtxb3Dls0/edit?usp=sharing] 
