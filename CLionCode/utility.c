@@ -88,10 +88,9 @@ void PrintBoard(U64* board, U64* kings) {
 }
 
 
-// Checks if the move is diagonal and valid
-// Checks if the move is diagonal and valid
+
+
 int IsLegalMove(U64* board, U64* kings, int player, int start, int end) {
-    // Basic move validation
     if (end < 0 || end >= 64 || start < 0 || start >= 64) {
         return 0; // Out of bounds
     }
@@ -116,22 +115,22 @@ int IsLegalMove(U64* board, U64* kings, int player, int start, int end) {
         return 1; // Valid move for regular pieces
         }
 
-    // Moves for kings (both directions)
-    if (abs(rowDiff) == 1 && (colDiff == -1 || colDiff == 1)) {
-        return 1; // Valid diagonal move for kings
+    // Moves for kings (all directions)
+    if (abs(rowDiff) <= 1 && abs(colDiff) <= 1) {
+        return 1; // Valid move for kings (1 square in any direction)
     }
 
-    // Capture move for regular pieces
+    // Capture moves for regular pieces
     if ((player == PLAYER1 && rowDiff == 2 && (colDiff == -2 || colDiff == 2)) ||
         (player == PLAYER2 && rowDiff == -2 && (colDiff == -2 || colDiff == 2))) {
         int middle = start + (rowDiff / 2) * 8 + (colDiff / 2);
         if ((board[PLAYER1] & (1ULL << middle)) || (board[PLAYER2] & (1ULL << middle))) {
-            return 1; // Valid capturing move
+            return 1; // Valid capturing move for regular pieces
         }
         }
 
-    // Capture move for kings
-    if (abs(rowDiff) == 2 && (colDiff == -2 || colDiff == 2)) {
+    // Capture moves for kings (moving two squares in any direction)
+    if (abs(rowDiff) == 2 && abs(colDiff) == 2) {
         int middle = start + (rowDiff / 2) * 8 + (colDiff / 2);
         if ((board[PLAYER1] & (1ULL << middle)) || (board[PLAYER2] & (1ULL << middle))) {
             return 1; // Valid capturing move for kings
@@ -140,6 +139,8 @@ int IsLegalMove(U64* board, U64* kings, int player, int start, int end) {
 
     return 0; // Invalid move
 }
+
+
 
 // Logic to update the game state after each move
 void UpdateGameState(U64* board, int* currentPlayer) {
@@ -201,7 +202,7 @@ int MovePiece(U64* board, U64* kings, int player, const char* from, const char* 
         PromoteToKing(board, kings, player, toIndex);
     }
 
-    printf("Moved from %s to %s. Board for Player 1: %llu, Kings: %llu\n", from, to, board[PLAYER1], kings[PLAYER1]);
+    printf("Successfully moved from %s to %s.", from, to);
 
     return 1; // Indicate success
 }
