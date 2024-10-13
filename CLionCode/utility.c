@@ -88,9 +88,10 @@ void PrintBoard(U64* board, U64* kings) {
 }
 
 
-
-
+// Checks if the move is diagonal and valid
+// Checks if the move is diagonal and valid
 int IsLegalMove(U64* board, U64* kings, int player, int start, int end) {
+    // Basic move validation
     if (end < 0 || end >= 64 || start < 0 || start >= 64) {
         return 0; // Out of bounds
     }
@@ -113,33 +114,41 @@ int IsLegalMove(U64* board, U64* kings, int player, int start, int end) {
     if ((player == PLAYER1 && rowDiff == 1 && (colDiff == -1 || colDiff == 1)) || // Down moves
         (player == PLAYER2 && rowDiff == -1 && (colDiff == -1 || colDiff == 1))) { // Up moves
         return 1; // Valid move for regular pieces
-        }
-
-    // Moves for kings (all directions)
-    if (abs(rowDiff) <= 1 && abs(colDiff) <= 1) {
-        return 1; // Valid move for kings (1 square in any direction)
     }
 
-    // Capture moves for regular pieces
+    // Moves for kings (both directions)
+    if (abs(rowDiff) == 1 && (colDiff == -1 || colDiff == 1)) {
+        return 1; // Valid diagonal move for kings
+    }
+
+    // Capture move for regular pieces
     if ((player == PLAYER1 && rowDiff == 2 && (colDiff == -2 || colDiff == 2)) ||
         (player == PLAYER2 && rowDiff == -2 && (colDiff == -2 || colDiff == 2))) {
         int middle = start + (rowDiff / 2) * 8 + (colDiff / 2);
         if ((board[PLAYER1] & (1ULL << middle)) || (board[PLAYER2] & (1ULL << middle))) {
-            return 1; // Valid capturing move for regular pieces
+            return 1; // Valid capturing move
         }
-        }
+    }
 
-    // Capture moves for kings (moving two squares in any direction)
-    if (abs(rowDiff) == 2 && abs(colDiff) == 2) {
+    // Capture move for kings
+    if (abs(rowDiff) == 2 && (colDiff == -2 || colDiff == 2)) {
         int middle = start + (rowDiff / 2) * 8 + (colDiff / 2);
         if ((board[PLAYER1] & (1ULL << middle)) || (board[PLAYER2] & (1ULL << middle))) {
             return 1; // Valid capturing move for kings
         }
     }
 
+    // Additional capture logic for kings (one square ahead or behind)
+    if (abs(rowDiff) == 1 && abs(colDiff) == 0) {
+        int middle = start + (rowDiff * 8);
+        if ((player == PLAYER1 && (board[PLAYER2] & (1ULL << middle))) ||
+            (player == PLAYER2 && (board[PLAYER1] & (1ULL << middle)))) {
+            return 1; // Valid capture for kings (forward or backward)
+        }
+    }
+
     return 0; // Invalid move
 }
-
 
 
 // Logic to update the game state after each move
@@ -202,7 +211,7 @@ int MovePiece(U64* board, U64* kings, int player, const char* from, const char* 
         PromoteToKing(board, kings, player, toIndex);
     }
 
-    printf("Successfully moved from %s to %s.", from, to);
+    printf("Moved from %s to %s.", from, to);
 
     return 1; // Indicate success
 }
