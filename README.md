@@ -59,3 +59,14 @@ classDiagram
     }
 
     BitManipulation -- BitboardChecker : uses
+```
+
+### Documentation 
+
+[View Report](CS 3503_Report_CheckersGame_RamiElmostafa (1) (2).docx)    
+
+### Video Demonstration 
+
+[Watch Video](CS_3503_Rami_Elmostafa_CheckersGame - Made with Clipchamp (2).mp4)  
+
+ 
